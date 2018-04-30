@@ -98,18 +98,22 @@ describe('TestDataBuilder', function() {
       }.bind(this));
   });
 
-  it('resolves references', function(done) {
+  it.only('resolves references', function(done) {
     var Parent = givenModel('Parent', { name: { type: String, required: true } });
     var Child = givenModel('Child', { parentName: String });
 
     new TestDataBuilder()
       .define('parent', Parent)
       .define('child', Child, {
-        parentName: TestDataBuilder.ref('parent.name')
+        parentName: TestDataBuilder.ref('parent.name'),
+        parentNames: [TestDataBuilder.ref('parent.name')],
       })
       .buildTo(this, function(err) {
         if(err) return done(err);
+        console.log(this.child);
         expect(this.child.parentName).to.equal(this.parent.name);
+        expect(this.child.parentNames instanceof Array).to.be.true;
+        expect(this.child.parentNames[0]).to.equal(this.parent.name);
         done();
       }.bind(this));
   });
